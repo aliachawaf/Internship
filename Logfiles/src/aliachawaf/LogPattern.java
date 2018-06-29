@@ -52,5 +52,4 @@ public class LogPattern {
 	public String toString() {	
 		return "type : " + logInfos[0] + " ; nb fields : " + logInfos[1] + " ; patterns n°" + logInfos[2] + "regex names : " + listRegexName;
 	}
-
 }

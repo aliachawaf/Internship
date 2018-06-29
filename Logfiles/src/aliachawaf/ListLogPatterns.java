@@ -50,14 +50,10 @@ public class ListLogPatterns {
 					pattern.getListRegexName().add(regexName);
 				}
 
-				
-				System.out.println(pattern);
-				
 				// we add the pattern found to the list
 				this.listPatterns.add(pattern);
 			}
 
-			//System.out.println(this.listPatterns);
 			b.close();
 
 		} catch (IOException e) {
