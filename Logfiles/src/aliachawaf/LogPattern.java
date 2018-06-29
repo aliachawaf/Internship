@@ -37,26 +37,20 @@ public class LogPattern {
 
 		if (substrings.length == 2) {
 
-				logInfos[0] = substrings[0];
+			logInfos[0] = substrings[0];
 			logInfos[1] = substrings[1].split("re")[0];
 			logInfos[2] = substrings[1].split("re")[1];
 			
 		} else {
-			logInfos[0] = substrings[0] + substrings[1];
+			logInfos[0] = substrings[0] + "-" + substrings[1];
 			logInfos[1] = substrings[2].split("re")[0];
 			logInfos[2] = substrings[2].split("re")[1];
 		}
 	}
 
 	@Override
-	public String toString() {
-		String buffer = "";
-		
-		for (String s : logInfos) {
-			buffer = buffer + s + "-";
-		}
-		
-		return buffer + listRegexName;
+	public String toString() {	
+		return "type : " + logInfos[0] + " ; nb fields : " + logInfos[1] + " ; patterns n°" + logInfos[2] + "regex names : " + listRegexName;
 	}
 
 }

@@ -11,14 +11,17 @@ public class ListRegexp {
 
 	private List<Regexp> listRegexp;
 
+	//constructor
 	public ListRegexp() {
-		this.listRegexp = new ArrayList<Regexp>();
+		listRegexp = new ArrayList<Regexp>();
 	}
 
+	// getter
 	public List<Regexp> getListRegexp() {
 		return listRegexp;
 	}
 
+	// setter
 	public void setListRegexp(String fileName) {
 
 		try {
@@ -33,7 +36,7 @@ public class ListRegexp {
 				regexp = line.split(" ");
 
 				// regexp[0] is the name
-				// regexp[1] is the definition
+				// regexp[1] is the definition	
 				Regexp re = new Regexp(regexp[0], regexp[1]);
 
 				// we add the couple name/definition found
@@ -47,6 +50,7 @@ public class ListRegexp {
 		}
 	}
 
+	// methods
 	public String getDefinitionByName(String name) {
 
 		String def = null;

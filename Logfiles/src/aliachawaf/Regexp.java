@@ -20,8 +20,6 @@ public class Regexp {
 
 	@Override
 	public String toString() {
-
 		return name + " " + definition;
-
 	}
 }
