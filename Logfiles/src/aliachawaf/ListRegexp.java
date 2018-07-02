@@ -11,7 +11,7 @@ public class ListRegexp {
 
 	private List<Regexp> listRegexp;
 
-	//constructor
+	// constructor
 	public ListRegexp() {
 		listRegexp = new ArrayList<Regexp>();
 	}
@@ -33,10 +33,10 @@ public class ListRegexp {
 			String[] regexp;
 
 			while ((line = b.readLine()) != null) {
-				regexp = line.split(" ");
+				regexp = line.split(" ", 2);
 
 				// regexp[0] is the name
-				// regexp[1] is the definition	
+				// regexp[1] is the definition
 				Regexp re = new Regexp(regexp[0], regexp[1]);
 
 				// we add the couple name/definition found
@@ -63,5 +63,18 @@ public class ListRegexp {
 		}
 
 		return def;
+	}
+
+	@Override
+	public String toString() {
+		String buffer = "";
+
+		for (Regexp re : this.getListRegexp()) {
+
+			buffer = buffer + re + "\n";
+
+		}
+
+		return buffer;
 	}
 }
