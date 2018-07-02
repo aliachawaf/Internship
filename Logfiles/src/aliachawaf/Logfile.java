@@ -58,24 +58,29 @@ public class Logfile {
 		String regexNameExpected;
 		String regexDefExpected;
 
+		// we analyse each line of logfile
 		for (String line : this.fields) {
 
 			fieldsLine = line.split(",");
 
+			// for each field of the current line, we check if it matches the regex expected
 			for (int i = 0; i < fieldsLine.length; i++) {
 
 				if (matches && i < pattern.getListRegexName().size()) {
 
 					regexNameExpected = pattern.getListRegexName().get(i);
 
-					// we have to found the definition of the regex from its name
-
+					// we get the definition of the regex from its name
 					regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
 
-					// compare the current fields of the line with the pattern's regex expected
+					// compare the current field of the line with the pattern's regex expected
 					matches = Pattern.matches(regexDefExpected, fieldsLine[i]);
 
-				} 
+					if (!matches) {
+						System.out.println("field : " + fieldsLine[i] + " ; expected : " + regexNameExpected + " "
+								+ regexDefExpected);
+					}
+				}
 			}
 
 			System.out.println(matches);
