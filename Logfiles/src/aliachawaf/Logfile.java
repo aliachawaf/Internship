@@ -17,7 +17,6 @@ public class Logfile {
 	public Logfile(String fileName) {
 		this.fileName = fileName;
 		this.fields = new ArrayList<String>();
-		this.setFields();
 	}
 
 	// getters & setters
@@ -43,6 +42,8 @@ public class Logfile {
 
 			b.close();
 
+		} catch (java.io.FileNotFoundException e) {
+			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -76,14 +77,13 @@ public class Logfile {
 					// compare the current field of the line with the pattern's regex expected
 					matches = Pattern.matches(regexDefExpected, fieldsLine[i]);
 
-					if (!matches) {
-						System.out.println("field : " + fieldsLine[i] + " ; expected : " + regexNameExpected + " "
-								+ regexDefExpected);
-					}
+					/*
+					 * if (!matches) { System.out.println("field : " + fieldsLine[i] +
+					 * " ; expected : " + regexNameExpected + " " + regexDefExpected); }
+					 */
 				}
 			}
 
-			System.out.println(matches);
 			if (matches) {
 				nbLinesMatching++;
 			} else {
@@ -91,6 +91,29 @@ public class Logfile {
 			}
 		}
 		return nbLinesMatching;
+	}
+
+	public String compareAllLogPatterns(ListLogPatterns listLogPatterns, ListRegexp listRegexp) {
+
+		String result = "";
+		String patternMatching = "Pattern(s) matching : ";
+		int nbLinesMatching;
+
+		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
+
+			nbLinesMatching = this.compareLogPattern(pattern, listRegexp);
+
+			result = result + pattern.getLogInfos()[0] + " pattern" + pattern.getLogInfos()[2] + " : "
+					+ nbLinesMatching + " / " + this.getFields().size() + "\n";
+			
+			if (nbLinesMatching==this.getFields().size()) {
+				patternMatching = patternMatching + pattern.getLogInfos()[0] + " n°" + pattern.getLogInfos()[2] + " ; ";
+			}
+		}
+		
+		result = patternMatching + "\n\n" + result;
+		
+		return result;
 	}
 
 }
