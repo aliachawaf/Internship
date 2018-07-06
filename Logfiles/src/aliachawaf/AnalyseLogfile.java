@@ -31,11 +31,14 @@ public class AnalyseLogfile {
 
 			if (Files.isReadable(file.toPath())) {
 
-				System.out.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp));
+				//System.out.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp));
+				System.out.print("header line : " + logFile.hasHeaderLine(listLogPatterns, listRegexp));
 				fileNotFound = false;
 			}
 		} while (fileNotFound);
 
+		
+		
 		scanner.close();
 	}
 }

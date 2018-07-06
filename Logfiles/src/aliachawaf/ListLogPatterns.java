@@ -21,7 +21,7 @@ public class ListLogPatterns {
 		return listPatterns;
 	}
 
-	// setter
+	// setter : open the file entered in parameter and read each line k
 	public void setListPatterns(String fileName) {
 
 		try {
@@ -60,5 +60,4 @@ public class ListLogPatterns {
 			e.printStackTrace();
 		}
 	}
-
 }
