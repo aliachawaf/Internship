@@ -237,6 +237,9 @@ public class Logfile {
 		// we consider that when startLine and finishLine are both equal to -1, then we have to analyse ALL the lines of the file
 		if (startLine==-1 && finishLine==-1) {
 			nbLinesProcessed = this.listLines.size();
+		} else if (finishLine>this.listLines.size()) {
+			finishLine = this.listLines.size();
+			nbLinesProcessed = finishLine-startLine+1;
 		} else {
 			nbLinesProcessed = finishLine-startLine+1;
 		}
