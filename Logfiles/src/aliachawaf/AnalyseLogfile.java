@@ -17,11 +17,12 @@ public class AnalyseLogfile {
 		listLogPatterns.setListPatterns("LogPatterns.txt");
 
 		boolean fileNotFound = true;
-		boolean linesInput = false;
+		boolean checkNotException = false;
 		String fileName;
 		int startLine = 0;
 		int finishLine = 0;
 		Logfile logFile;
+		String allLines;
 
 		System.out.print("Enter the name of your logfile (path) : ");
 
@@ -33,36 +34,86 @@ public class AnalyseLogfile {
 
 			File file = new File(fileName);
 
-			
-			if (Files.isReadable(file.toPath())) {
-				
+			if (Files.isReadable(file.toPath()) && !fileName.matches("")) {
 				fileNotFound = false;
 			}
 		} while (fileNotFound);
 
-		
-		
-		System.out.print("Do you want to analyse all the lines (yes/no)? ");
-		
+		System.out.print("\nDo you want to analyse all the lines (yes/no)? ");
+
 		do {
-			String allLines = scanner.nextLine();
-			
-			if (allLines.toLowerCase().matches("yes")) {
-				startLine = -1;
-				finishLine = -1;
-				linesInput = true;
-			} else if (allLines.toLowerCase().matches("no")) {
-				System.out.println("enter lines : ");
-				startLine = scanner.nextInt();
-				finishLine = scanner.nextInt();
-				linesInput = true;
+			allLines = scanner.nextLine();
+
+			if (!allLines.matches("no") && !allLines.matches("yes")) {
+				System.out.print("Your answer is different of 'no' or 'yes'. Re-enter it : ");
 			}
-			
-		} while (!linesInput);
+
+		} while (!allLines.matches("no") && !allLines.matches("yes"));
+
+		if (allLines.toLowerCase().matches("yes")) {
+			startLine = -1;
+			finishLine = -1;
+
+		} else {
+
+			System.out.println("Enter start line number : ");
+
+			while (!checkNotException) {
+				try {
+					do {
+						startLine = scanner.nextInt();
+						scanner.nextLine();
+
+						if (startLine < 0) {
+							System.out.print("your start line is < 0. Re-enter it: ");
+						}
+
+					} while (startLine < 0);
+
+					checkNotException = true;
+
+				} catch (java.util.InputMismatchException e) {
+					System.out.print("\nThe line number you've entered is not a number ! Re-enter it : ");
+					scanner.nextLine();
+				}
+			}
+
+			checkNotException = false;
+
+			System.out.println("Enter finish line number : ");
+
+			while (!checkNotException) {
+				try {
+					do {
+						finishLine = scanner.nextInt();
+						scanner.nextLine();
+
+						if (finishLine < 0) {
+							System.out.print("your finish line is < 0. Re-enter it: ");
+						}
+
+					} while (finishLine < 0);
+
+					checkNotException = true;
+
+				} catch (java.util.InputMismatchException e) {
+					System.out.print("\nThe line number you've entered is not a number ! Re-enter it : ");
+					scanner.nextLine();
+				}
+			}
+		}
 		
-		System.out.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, startLine, finishLine));
-		//System.out.print("header line : " + logFile.hasHeaderLine(listLogPatterns, listRegexp));
 		
+		if (startLine <= finishLine) {
+			System.out
+					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, startLine, finishLine));
+			// System.out.print("header line : " + logFile.hasHeaderLine(listLogPatterns,
+			// listRegexp));
+		} else {
+			System.out
+					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, finishLine, startLine));
+		}
+
 		scanner.close();
 	}
 }

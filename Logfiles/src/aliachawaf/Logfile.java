@@ -49,6 +49,8 @@ public class Logfile {
 
 		} catch (java.nio.file.NoSuchFileException e) {
 			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
+		} catch (java.nio.file.AccessDeniedException e) {
+			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -182,11 +184,12 @@ public class Logfile {
 		
 		// we consider that when startLine and finishLine are both equal to -1, then we have to analyse ALL the lines of the file
 		if (startLine==-1 && finishLine==-1) {
+			startLine = 0;
 			finishLine = this.listLines.size();
 		}
 
 		// we analyse each line of logfile
-		for (int l = startLine; l <= finishLine; l++) {
+		for (int l = startLine; l < finishLine; l++) {
 
 			CSVRecord line = this.listLines.get(l);
 			// for (CSVRecord line : this.listLines) {
