@@ -24,6 +24,7 @@ public class AnalyseLogfile {
 		Logfile logFile;
 		String allLines;
 
+		// input logfile name
 		System.out.print("Enter the name of your logfile (path) : ");
 
 		do {
@@ -39,6 +40,11 @@ public class AnalyseLogfile {
 			}
 		} while (fileNotFound);
 
+		// System.out.println(logFile.getListLines().get(0));
+		// System.out.println(logFile.getListLines().get(0).get(0));
+		// System.out.println(logFile.getListLines().get(0).size());
+
+		// ask if he want to analyse the whole file
 		System.out.print("\nDo you want to analyse all the lines (yes/no)? ");
 
 		do {
@@ -56,6 +62,7 @@ public class AnalyseLogfile {
 
 		} else {
 
+			// input start line
 			System.out.println("Enter start line number : ");
 
 			while (!checkNotException) {
@@ -80,6 +87,7 @@ public class AnalyseLogfile {
 
 			checkNotException = false;
 
+			// input finish line
 			System.out.println("Enter finish line number : ");
 
 			while (!checkNotException) {
@@ -102,17 +110,20 @@ public class AnalyseLogfile {
 				}
 			}
 		}
-		
-		
+
+		// lanch the comparison with all the patterns according to the lines entered
 		if (startLine <= finishLine) {
 			System.out
 					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, startLine, finishLine));
-			// System.out.print("header line : " + logFile.hasHeaderLine(listLogPatterns,
-			// listRegexp));
 		} else {
 			System.out
 					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, finishLine, startLine));
 		}
+		
+		for (String s : logFile.getNoneMatching()) {
+			System.out.println(s);
+		}
+		
 
 		scanner.close();
 	}
