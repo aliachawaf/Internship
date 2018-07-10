@@ -198,15 +198,8 @@ public class Logfile {
 		String regexDefExpected;
 		String lineNoneMatching;
 
-		// we consider that when startLine and finishLine are both equal to -1, then we
-		// have to analyse ALL the lines of the file
-		if (startLine == -1 && finishLine == -1) {
-			startLine = 0;
-			finishLine = this.listLines.size();
-		}
-
 		// we analyse each line of logfile
-		for (int l = startLine; l < finishLine; l++) {
+		for (int l = startLine - 1; l < finishLine; l++) {
 
 			CSVRecord line = this.listLines.get(l);
 			// for (CSVRecord line : this.listLines) {
@@ -225,15 +218,14 @@ public class Logfile {
 					matches = Pattern.matches(regexDefExpected, line.get(i));
 
 					if (!matches) {
+						
 						lineNoneMatching = "line : " + (l + 1) + "  /  column : " + (i + 1) + "  /  pattern : "
 								+ pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + "  /  expected : "
 								+ pattern.getListRegexName().get(i) + "  /  found : " + line.get(i);
 
 						this.getNoneMatching().add(lineNoneMatching);
 						lineMatches = false;
-
 					}
-
 				}
 
 				if (lineMatches) {
@@ -245,11 +237,13 @@ public class Logfile {
 
 				matches = true;
 
-			} else {
-				// if the line doesn't have the same number of fields of the pattern, then it
-				// doesn't match
-				matches = false;
-			}
+			} 
+			
+//			else {
+//				// if the line doesn't have the same number of fields of the pattern, then it
+//				// doesn't match
+//				lineMatches = false;
+//			}
 		}
 		return nbLinesMatching;
 	}
@@ -268,6 +262,8 @@ public class Logfile {
 		// have to analyse ALL the lines of the file
 		if (startLine == -1 && finishLine == -1) {
 			nbLinesProcessed = this.listLines.size();
+			startLine = 1;
+			finishLine = this.listLines.size();
 		} else if (finishLine > this.listLines.size()) {
 			finishLine = this.listLines.size();
 			nbLinesProcessed = finishLine - startLine + 1;
