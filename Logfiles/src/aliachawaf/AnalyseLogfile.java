@@ -40,9 +40,6 @@ public class AnalyseLogfile {
 			}
 		} while (fileNotFound);
 
-		// System.out.println(logFile.getListLines().get(0));
-		// System.out.println(logFile.getListLines().get(0).get(0));
-		// System.out.println(logFile.getListLines().get(0).size());
 
 		// ask if he want to analyse the whole file
 		System.out.print("\nDo you want to analyse all the lines (yes/no)? ");
@@ -121,9 +118,6 @@ public class AnalyseLogfile {
 		}
 		
 		logFile.recordNoneMatchingLine();
-		
-		
-		
 
 		scanner.close();
 	}

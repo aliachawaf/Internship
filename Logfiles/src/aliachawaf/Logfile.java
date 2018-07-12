@@ -66,52 +66,6 @@ public class Logfile {
 		}
 	}
 
-	public boolean hasHeaderLine(ListLogPatterns listLogPatterns, ListRegexp listRegexp) {
-		// returns true if the first line is header line, else returns false
-
-		boolean matches = true;
-		int nbPatternMatching = 0;
-
-		String regexNameExpected;
-		String regexDefExpected;
-
-		CSVRecord firstLine = this.listLines.get(0);
-
-		// for each pattern of the list
-		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
-
-			if (firstLine.size() == pattern.getListRegexName().size()) {
-				// for each field of the line
-				for (int i = 0; i < firstLine.size(); i++) {
-
-					if (matches && i < pattern.getListRegexName().size()) {
-
-						// we get the regex we expect to match with from the current pattern
-						regexNameExpected = pattern.getListRegexName().get(i);
-
-						// we get the definition of the regex from its name
-						regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
-
-						// compare the current field of the line with the pattern's regex expected
-						matches = Pattern.matches(regexDefExpected, firstLine.get(i));
-					}
-				}
-
-				if (matches) {
-					nbPatternMatching++;
-				} else {
-					matches = true;
-				}
-
-			} else {
-				matches = false;
-			}
-		}
-
-		// if none pattern matches the first line, then it is a header line
-		return (nbPatternMatching == 0);
-	}
-
 	// compare each lines of the logfile with the pattern entered as parameter
 	public int compareLogPattern(LogPattern pattern, ListRegexp listRegexp, int startLine, int finishLine) {
 
@@ -189,10 +143,10 @@ public class Logfile {
 		} else {
 			nbLinesProcessed = finishLine - startLine + 1;
 		}
-		
-		if (startLine==1 && this.hasHeaderLine(listLogPatterns, listRegexp)) {
+
+		if (startLine == 1 && this.hasHeaderLine(listLogPatterns, listRegexp)) {
 			startLine = 2;
-			nbLinesProcessed = nbLinesProcessed -1;
+			nbLinesProcessed = nbLinesProcessed - 1;
 		}
 
 		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
@@ -256,6 +210,52 @@ public class Logfile {
 				e.printStackTrace();
 			}
 		}
-
 	}
+
+	public boolean hasHeaderLine(ListLogPatterns listLogPatterns, ListRegexp listRegexp) {
+		// returns true if the first line is header line, else returns false
+
+		boolean matches = true;
+		int nbPatternMatching = 0;
+
+		String regexNameExpected;
+		String regexDefExpected;
+
+		CSVRecord firstLine = this.listLines.get(0);
+
+		// for each pattern of the list
+		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
+
+			if (firstLine.size() == pattern.getListRegexName().size()) {
+				// for each field of the line
+				for (int i = 0; i < firstLine.size(); i++) {
+
+					if (matches && i < pattern.getListRegexName().size()) {
+
+						// we get the regex we expect to match with from the current pattern
+						regexNameExpected = pattern.getListRegexName().get(i);
+
+						// we get the definition of the regex from its name
+						regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
+
+						// compare the current field of the line with the pattern's regex expected
+						matches = Pattern.matches(regexDefExpected, firstLine.get(i));
+					}
+				}
+
+				if (matches) {
+					nbPatternMatching++;
+				} else {
+					matches = true;
+				}
+
+			} else {
+				matches = false;
+			}
+		}
+
+		// if none pattern matches the first line, then it is a header line
+		return (nbPatternMatching == 0);
+	}
+
 }
