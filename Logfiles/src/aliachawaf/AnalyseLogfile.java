@@ -71,11 +71,11 @@ public class AnalyseLogfile {
 						startLine = scanner.nextInt();
 						scanner.nextLine();
 
-						if (startLine < 0) {
-							System.out.print("your start line is < 0. Re-enter it: ");
+						if (startLine <= 0) {
+							System.out.print("your start line is <= 0. Re-enter it: ");
 						}
 
-					} while (startLine < 0);
+					} while (startLine <= 0);
 
 					checkNotException = true;
 
@@ -96,11 +96,11 @@ public class AnalyseLogfile {
 						finishLine = scanner.nextInt();
 						scanner.nextLine();
 
-						if (finishLine < 0) {
-							System.out.print("your finish line is < 0. Re-enter it: ");
+						if (finishLine <= 0) {
+							System.out.print("your finish line is <= 0. Re-enter it: ");
 						}
 
-					} while (finishLine < 0);
+					} while (finishLine <= 0);
 
 					checkNotException = true;
 
@@ -120,9 +120,9 @@ public class AnalyseLogfile {
 					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, finishLine, startLine));
 		}
 		
-		for (String s : logFile.getNoneMatching()) {
-			System.out.println(s);
-		}
+		logFile.recordNoneMatchingLine();
+		
+		
 		
 
 		scanner.close();

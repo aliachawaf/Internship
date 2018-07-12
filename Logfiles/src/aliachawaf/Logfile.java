@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -50,7 +51,6 @@ public class Logfile {
 			for (CSVRecord line : csvParser) {
 
 				this.listLines.add(line);
-
 			}
 
 			csvParser.close();
@@ -66,81 +66,6 @@ public class Logfile {
 		}
 	}
 
-	// compare each lines of the logfile with the pattern entered as parameter
-	// public int compareLogPattern(LogPattern pattern, ListRegexp listRegexp) {
-	//
-	// int nbLinesMatching = 0;
-	// boolean matches = true;
-	//
-	// String regexNameExpected;
-	// String regexDefExpected;
-	//
-	// // we analyse each line of logfile
-	// for (CSVRecord line : this.listLines) {
-	//
-	// if (line.size() == pattern.getListRegexName().size()) {
-	//
-	// // for each field of the current line, we check if it matches the regex
-	// expected
-	// for (int i = 0; i < line.size(); i++) {
-	//
-	// // when a field doesn't matches, we don't analyse the next fields
-	// if (matches) {
-	//
-	// regexNameExpected = pattern.getListRegexName().get(i);
-	//
-	// // we get the definition of the regex from its name
-	// regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
-	//
-	// // compare the current field of the line with the pattern's regex expected
-	// matches = Pattern.matches(regexDefExpected, line.get(i));
-	// }
-	// }
-	//
-	// if (matches) {
-	// nbLinesMatching++;
-	// } else {
-	// // for the next line to analyse, we give matches its initial value
-	// matches = true;
-	// }
-	//
-	// } else {
-	// // if the line doesn't have the same number of fields of the pattern, then it
-	// // doesn't match
-	// matches = false;
-	// }
-	// }
-	// return nbLinesMatching;
-	// }
-	//
-	// // compare all the lines of the logfile with all the patterns of
-	// listLogPatterns
-	// public String compareAllLogPatterns(ListLogPatterns listLogPatterns,
-	// ListRegexp listRegexp) {
-	//
-	// String result = "";
-	// String patternMatching = "Pattern(s) matching : ";
-	// int nbLinesMatching;
-	//
-	// for (LogPattern pattern : listLogPatterns.getListPatterns()) {
-	//
-	// nbLinesMatching = this.compareLogPattern(pattern, listRegexp);
-	//
-	// result = result + pattern.getLogInfos()[0] + " pattern" +
-	// pattern.getLogInfos()[2] + " : " + nbLinesMatching
-	// + " / " + this.getListLines().size() + "\n";
-	//
-	// if (nbLinesMatching == this.getListLines().size()) {
-	// patternMatching = patternMatching + pattern.getLogInfos()[0] + " n°" +
-	// pattern.getLogInfos()[2] + " ; ";
-	// }
-	// }
-	//
-	// result = patternMatching + "\n\n" + result;
-	//
-	// return result;
-	// }
-
 	public boolean hasHeaderLine(ListLogPatterns listLogPatterns, ListRegexp listRegexp) {
 		// returns true if the first line is header line, else returns false
 
@@ -151,8 +76,6 @@ public class Logfile {
 		String regexDefExpected;
 
 		CSVRecord firstLine = this.listLines.get(0);
-
-		System.out.println(firstLine);
 
 		// for each pattern of the list
 		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
@@ -175,7 +98,6 @@ public class Logfile {
 				}
 
 				if (matches) {
-					System.out.println(pattern.getLogInfos()[0] + " " + pattern.getLogInfos()[2]);
 					nbPatternMatching++;
 				} else {
 					matches = true;
@@ -186,7 +108,6 @@ public class Logfile {
 			}
 		}
 
-		System.out.println(nbPatternMatching);
 		// if none pattern matches the first line, then it is a header line
 		return (nbPatternMatching == 0);
 	}
@@ -223,15 +144,11 @@ public class Logfile {
 
 					if (!matches) {
 
-						// lineNoneMatching = "line : " + (l + 1) + " / column : " + (i + 1) + " /
-						// pattern : "
-						// + pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + " / expected : "
-						// + pattern.getListRegexName().get(i) + " / found : " + line.get(i);
+						lineNoneMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
+								+ pattern.getLogInfos()[2] + " " + pattern.getListRegexName().get(i) + " "
+								+ line.get(i);
 
-						this.recordNoneMatchingLine(l + 1, i + 1, pattern.getLogInfos()[0] + pattern.getLogInfos()[2],
-								pattern.getListRegexName().get(i), line.get(i));
-
-						//this.getNoneMatching().add(lineNoneMatching);
+						this.getNoneMatching().add(lineNoneMatching);
 						lineMatches = false;
 					}
 				}
@@ -246,12 +163,6 @@ public class Logfile {
 				matches = true;
 
 			}
-
-			// else {
-			// // if the line doesn't have the same number of fields of the pattern, then it
-			// // doesn't match
-			// lineMatches = false;
-			// }
 		}
 		return nbLinesMatching;
 	}
@@ -278,6 +189,11 @@ public class Logfile {
 		} else {
 			nbLinesProcessed = finishLine - startLine + 1;
 		}
+		
+		if (startLine==1 && this.hasHeaderLine(listLogPatterns, listRegexp)) {
+			startLine = 2;
+			nbLinesProcessed = nbLinesProcessed -1;
+		}
 
 		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
 
@@ -296,26 +212,16 @@ public class Logfile {
 		return result;
 	}
 
-	public void recordNoneMatchingLine(int line, int column, String patternExpected, String fieldExpected,
-			String found) {
+	public void recordNoneMatchingLine() {
 
 		// CSV file header
-		Object[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
-
-		List recordNoneMatching = new ArrayList();
-		recordNoneMatching.add(this.getFileName());
-		recordNoneMatching.add(line);
-		recordNoneMatching.add(column);
-		recordNoneMatching.add(patternExpected);
-		recordNoneMatching.add(fieldExpected);
-		recordNoneMatching.add(found);
+		String[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
 
 		FileWriter fileWriter = null;
-
 		CSVPrinter csvFilePrinter = null;
 
 		// Create the CSVFormat object with "\n" as a record delimiter
-		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
+		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
 
 		try {
 
@@ -325,18 +231,31 @@ public class Logfile {
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
-			// Create CSV file header
-			csvFilePrinter.printRecord(FILE_HEADER);
+			for (String record : this.noneMatching) {
 
-			// Write the recordNoneMatching to the CSV file
-			csvFilePrinter.printRecord(recordNoneMatching);
+				String[] field = record.split(" ", 5);
 
-			System.out.println("CSV file was created successfully !!!");
+				List<String> data = Arrays.asList(this.fileName, field[0], field[1], field[2], field[3], field[4]);
+
+				// Write the recordNoneMatching to the CSV file
+				csvFilePrinter.printRecord(data);
+			}
+
+			System.out.println("Write CSV successfully!");
 
 		} catch (Exception e) {
+			System.out.println("Writing CSV error!");
 			e.printStackTrace();
-
-		} 
+		} finally {
+			try {
+				fileWriter.flush();
+				fileWriter.close();
+				csvFilePrinter.close();
+			} catch (IOException e) {
+				System.out.println("Flushing/closing error!");
+				e.printStackTrace();
+			}
+		}
 
 	}
 }
