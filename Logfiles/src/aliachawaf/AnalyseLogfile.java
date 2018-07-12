@@ -40,7 +40,6 @@ public class AnalyseLogfile {
 			}
 		} while (fileNotFound);
 
-
 		// ask if he want to analyse the whole file
 		System.out.print("\nDo you want to analyse all the lines (yes/no)? ");
 
@@ -116,8 +115,11 @@ public class AnalyseLogfile {
 			System.out
 					.println("\n" + logFile.compareAllLogPatterns(listLogPatterns, listRegexp, finishLine, startLine));
 		}
-		
-		logFile.recordNoneMatchingLine();
+
+		// input file name for none matching lines
+		System.out.print("Enter a file name to create recording the none matching lines : ");
+		String file = scanner.nextLine();
+		logFile.recordNoneMatchingLine(file);
 
 		scanner.close();
 	}

@@ -166,7 +166,7 @@ public class Logfile {
 		return result;
 	}
 
-	public void recordNoneMatchingLine() {
+	public void recordNoneMatchingLine(String file) {
 
 		// CSV file header
 		String[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
@@ -180,7 +180,7 @@ public class Logfile {
 		try {
 
 			// initialise FileWriter object
-			fileWriter = new FileWriter("test.csv");
+			fileWriter = new FileWriter(file + ".csv");
 
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
@@ -257,5 +257,4 @@ public class Logfile {
 		// if none pattern matches the first line, then it is a header line
 		return (nbPatternMatching == 0);
 	}
-
 }
