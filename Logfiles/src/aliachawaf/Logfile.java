@@ -1,5 +1,6 @@
 package aliachawaf;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 
 public class Logfile {
@@ -57,6 +59,8 @@ public class Logfile {
 			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
 		} catch (java.nio.file.AccessDeniedException e) {
 			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
+		} catch (java.nio.file.InvalidPathException e) {
+			System.out.print("Invalid path ! Re-enter it : ");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -218,12 +222,16 @@ public class Logfile {
 					matches = Pattern.matches(regexDefExpected, line.get(i));
 
 					if (!matches) {
-						
-						lineNoneMatching = "line : " + (l + 1) + "  /  column : " + (i + 1) + "  /  pattern : "
-								+ pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + "  /  expected : "
-								+ pattern.getListRegexName().get(i) + "  /  found : " + line.get(i);
 
-						this.getNoneMatching().add(lineNoneMatching);
+						// lineNoneMatching = "line : " + (l + 1) + " / column : " + (i + 1) + " /
+						// pattern : "
+						// + pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + " / expected : "
+						// + pattern.getListRegexName().get(i) + " / found : " + line.get(i);
+
+						this.recordNoneMatchingLine(l + 1, i + 1, pattern.getLogInfos()[0] + pattern.getLogInfos()[2],
+								pattern.getListRegexName().get(i), line.get(i));
+
+						//this.getNoneMatching().add(lineNoneMatching);
 						lineMatches = false;
 					}
 				}
@@ -237,13 +245,13 @@ public class Logfile {
 
 				matches = true;
 
-			} 
-			
-//			else {
-//				// if the line doesn't have the same number of fields of the pattern, then it
-//				// doesn't match
-//				lineMatches = false;
-//			}
+			}
+
+			// else {
+			// // if the line doesn't have the same number of fields of the pattern, then it
+			// // doesn't match
+			// lineMatches = false;
+			// }
 		}
 		return nbLinesMatching;
 	}
@@ -286,5 +294,49 @@ public class Logfile {
 		result = patternMatching + "\n\n" + result;
 
 		return result;
+	}
+
+	public void recordNoneMatchingLine(int line, int column, String patternExpected, String fieldExpected,
+			String found) {
+
+		// CSV file header
+		Object[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
+
+		List recordNoneMatching = new ArrayList();
+		recordNoneMatching.add(this.getFileName());
+		recordNoneMatching.add(line);
+		recordNoneMatching.add(column);
+		recordNoneMatching.add(patternExpected);
+		recordNoneMatching.add(fieldExpected);
+		recordNoneMatching.add(found);
+
+		FileWriter fileWriter = null;
+
+		CSVPrinter csvFilePrinter = null;
+
+		// Create the CSVFormat object with "\n" as a record delimiter
+		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
+
+		try {
+
+			// initialise FileWriter object
+			fileWriter = new FileWriter("test.csv");
+
+			// initialise CSVPrinter object
+			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
+
+			// Create CSV file header
+			csvFilePrinter.printRecord(FILE_HEADER);
+
+			// Write the recordNoneMatching to the CSV file
+			csvFilePrinter.printRecord(recordNoneMatching);
+
+			System.out.println("CSV file was created successfully !!!");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		} 
+
 	}
 }
