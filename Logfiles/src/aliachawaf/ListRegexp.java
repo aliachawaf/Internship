@@ -72,9 +72,7 @@ public class ListRegexp {
 		for (Regexp re : this.getListRegexp()) {
 
 			buffer = buffer + re + "\n";
-
 		}
-
 		return buffer;
 	}
 }

@@ -42,11 +42,11 @@ public class Logfile {
 	}
 
 	// read the logfile and add its lines in the list
-	public void setFields() {
+	public void setFields(char delimiter) {
 
 		try {
 			Reader reader = Files.newBufferedReader(Paths.get(fileName));
-			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
+			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(delimiter));
 
 			for (CSVRecord line : csvParser) {
 
@@ -99,7 +99,7 @@ public class Logfile {
 					if (!matches) {
 
 						lineNoneMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
-								+ pattern.getLogInfos()[2] + " " + pattern.getListRegexName().get(i) + " "
+								+ pattern.getLogInfos()[2] + pattern.getListRegexName().get(i) + " "
 								+ line.get(i);
 
 						this.getNoneMatching().add(lineNoneMatching);
@@ -178,7 +178,7 @@ public class Logfile {
 		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
 
 		try {
-
+			
 			// initialise FileWriter object
 			fileWriter = new FileWriter(file + ".csv");
 
@@ -188,7 +188,7 @@ public class Logfile {
 			for (String record : this.noneMatching) {
 
 				String[] field = record.split(" ", 5);
-
+				
 				List<String> data = Arrays.asList(this.fileName, field[0], field[1], field[2], field[3], field[4]);
 
 				// Write the recordNoneMatching to the CSV file
@@ -222,6 +222,8 @@ public class Logfile {
 		String regexDefExpected;
 
 		CSVRecord firstLine = this.listLines.get(0);
+		
+		System.out.println(firstLine);
 
 		// for each pattern of the list
 		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
@@ -244,6 +246,7 @@ public class Logfile {
 				}
 
 				if (matches) {
+					System.out.println(pattern.getLogInfos()[0] + pattern.getLogInfos()[2]);
 					nbPatternMatching++;
 				} else {
 					matches = true;
@@ -253,6 +256,8 @@ public class Logfile {
 				matches = false;
 			}
 		}
+		
+		System.out.println(nbPatternMatching);
 
 		// if none pattern matches the first line, then it is a header line
 		return (nbPatternMatching == 0);

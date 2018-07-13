@@ -23,6 +23,7 @@ public class AnalyseLogfile {
 		int finishLine = 0;
 		Logfile logFile;
 		String allLines;
+		char delimiter;
 
 		// input logfile name
 		System.out.print("Enter the name of your logfile (path) : ");
@@ -31,7 +32,10 @@ public class AnalyseLogfile {
 
 			fileName = scanner.nextLine();
 			logFile = new Logfile(fileName);
-			logFile.setFields();
+			
+			System.out.print("Enter the delimiter (separator) used in your file : ");
+			delimiter = scanner.nextLine().charAt(0);
+			logFile.setFields(delimiter);
 
 			File file = new File(fileName);
 
@@ -122,5 +126,7 @@ public class AnalyseLogfile {
 		logFile.recordNoneMatchingLine(file);
 
 		scanner.close();
+		
+		System.out.print(logFile.hasHeaderLine(listLogPatterns, listRegexp));
 	}
 }
