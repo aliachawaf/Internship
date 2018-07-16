@@ -121,12 +121,10 @@ public class AnalyseLogfile {
 		}
 
 		// input file name for none matching lines
-		System.out.print("Enter a file name to create recording the none matching lines : ");
+		/*System.out.print("Enter a file name to create recording the none matching lines : ");
 		String file = scanner.nextLine();
-		logFile.recordNoneMatchingLine(file);
+		logFile.recordNoneMatchingLine(file);*/
 
 		scanner.close();
-		
-		System.out.print(logFile.hasHeaderLine(listLogPatterns, listRegexp));
 	}
 }

@@ -19,13 +19,13 @@ public class Logfile {
 
 	private String fileName;
 	private List<CSVRecord> listLines;
-	private List<String> noneMatching;
+	private List<String> nonMatching;
 
 	// constructor
 	public Logfile(String fileName) {
 		this.fileName = fileName;
 		this.listLines = new ArrayList<CSVRecord>();
-		this.noneMatching = new ArrayList<String>();
+		this.nonMatching = new ArrayList<String>();
 	}
 
 	// getters & setters
@@ -37,8 +37,8 @@ public class Logfile {
 		return listLines;
 	}
 
-	public List<String> getNoneMatching() {
-		return noneMatching;
+	public List<String> getNonMatching() {
+		return nonMatching;
 	}
 
 	// read the logfile and add its lines in the list
@@ -75,7 +75,7 @@ public class Logfile {
 
 		String regexNameExpected;
 		String regexDefExpected;
-		String lineNoneMatching;
+		String lineNonMatching;
 
 		// we analyse each line of logfile
 		for (int l = startLine - 1; l < finishLine; l++) {
@@ -98,11 +98,11 @@ public class Logfile {
 
 					if (!matches) {
 
-						lineNoneMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
+						lineNonMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
 								+ pattern.getLogInfos()[2] + pattern.getListRegexName().get(i) + " "
 								+ line.get(i);
 
-						this.getNoneMatching().add(lineNoneMatching);
+						this.getNonMatching().add(lineNonMatching);
 						lineMatches = false;
 					}
 				}
@@ -166,8 +166,9 @@ public class Logfile {
 		return result;
 	}
 
-	public void recordNoneMatchingLine(String file) {
+	public void recordNonMatchingLine() {
 
+		String file = "InfosNonMatchingLines";
 		// CSV file header
 		String[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
 
@@ -185,13 +186,13 @@ public class Logfile {
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
-			for (String record : this.noneMatching) {
+			for (String record : this.nonMatching) {
 
 				String[] field = record.split(" ", 5);
 				
 				List<String> data = Arrays.asList(this.fileName, field[0], field[1], field[2], field[3], field[4]);
 
-				// Write the recordNoneMatching to the CSV file
+				// Write the recordNonMatching to the CSV file
 				csvFilePrinter.printRecord(data);
 			}
 
@@ -259,7 +260,7 @@ public class Logfile {
 		
 		System.out.println(nbPatternMatching);
 
-		// if none pattern matches the first line, then it is a header line
+		// if non pattern matches the first line, then it is a header line
 		return (nbPatternMatching == 0);
 	}
 }
