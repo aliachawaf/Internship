@@ -209,7 +209,7 @@ public class LogFile {
 		try {
 
 			// initialise FileWriter object
-			fileWriter = new FileWriter(file + ".csv");
+			fileWriter = new FileWriter(file);
 
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
@@ -224,7 +224,7 @@ public class LogFile {
 				csvFilePrinter.printRecord(data);
 			}
 
-			System.out.println("Write CSV successfully!");
+			System.out.println("Write " + file + " successfully!");
 
 		} catch (Exception e) {
 			System.out.println("Writing CSV error!");
@@ -280,7 +280,7 @@ public class LogFile {
 		try {
 
 			// initialise FileWriter object
-			fileWriter = new FileWriter("NonMatchingLines.csv");
+			fileWriter = new FileWriter("nonMatchingLines.csv");
 
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
@@ -289,6 +289,8 @@ public class LogFile {
 
 				csvFilePrinter.printRecord(record);
 			}
+			
+			System.out.println("Write nonMatchingLines.csv successfully!");
 
 		} catch (Exception e) {
 			System.out.println("Writing CSV error!");
