@@ -21,7 +21,11 @@ public class ListRegexp {
 		return listRegexp;
 	}
 
-	// setter
+	/* setter : 
+	 * we read the file of regular expressions entered in parameter, 
+	 * collect the regex found (name + def), 
+	 * and then form the list of regex
+	 */
 	public void setListRegexp(String fileName) {
 
 		try {
@@ -32,14 +36,20 @@ public class ListRegexp {
 			String line = "";
 			String[] regexp;
 
+			// while we haven't reached the end of file
 			while ((line = b.readLine()) != null) {
+				
+				// we split the line in 2 to have the name and the def of the regex
 				regexp = line.split(" ", 2);
 
-				// regexp[0] is the name
-				// regexp[1] is the definition
+				/* regexp[0] is the name
+				 * regexp[1] is the definition 
+				 */
+				
+				// create the regex found with the couple name/def
 				Regexp re = new Regexp(regexp[0], regexp[1]);
 
-				// we add the couple name/definition found
+				// add the regex to the list
 				this.listRegexp.add(re);
 			}
 
@@ -52,7 +62,8 @@ public class ListRegexp {
 
 	// methods
 	public String getDefinitionByName(String name) {
-
+	
+		// read the list of regex and returns the def corresponding to the name in parameter		
 		String def = null;
 
 		for (Regexp re : this.listRegexp) {
@@ -61,7 +72,6 @@ public class ListRegexp {
 				def = re.getDefinition();
 			}
 		}
-
 		return def;
 	}
 
@@ -70,7 +80,6 @@ public class ListRegexp {
 		String buffer = "";
 
 		for (Regexp re : this.getListRegexp()) {
-
 			buffer = buffer + re + "\n";
 		}
 		return buffer;

@@ -29,7 +29,7 @@ public class LogFile {
 		this.nonMatching = new ArrayList<String>();
 	}
 
-	// getters & setters
+	// getters
 	public String getFileName() {
 		return fileName;
 	}
@@ -42,7 +42,7 @@ public class LogFile {
 		return nonMatching;
 	}
 
-	// read the logfile and add its lines in the list
+	// setter : we read the logfile and add its lines in the list of lines
 	public void setListLines(char delimiter) {
 
 		try {
@@ -67,23 +67,24 @@ public class LogFile {
 		}
 	}
 
-	// compare each lines of the logfile with the pattern entered as parameter
+	// depending on start and finish lines, we compare the lines of the logfile with
+	// the pattern in parameter
 	public int compareLogPattern(LogPattern pattern, ListRegexp listRegexp, int startLine, int finishLine) {
 
 		int nbLinesMatching = 0;
-		boolean matches = true;
+		boolean fieldMatches = true;
 		boolean lineMatches = true;
 
 		String regexNameExpected;
 		String regexDefExpected;
-		String lineNonMatching;
+		String infosLineNonMatching;
 
 		// we analyse each line of logfile
 		for (int l = startLine - 1; l < finishLine; l++) {
 
 			CSVRecord line = this.listLines.get(l);
-			// for (CSVRecord line : this.listLines) {
 
+			// we compare only if the line has the same number of fields than the pattern
 			if (line.size() == pattern.getListRegexName().size()) {
 
 				// for each field of the current line, we check if it matches the regex expected
@@ -91,37 +92,44 @@ public class LogFile {
 
 					regexNameExpected = pattern.getListRegexName().get(i);
 
-					// we get the definition of the regex from its name
+					// get the definition of the regex from its name
 					regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
 
 					// compare the current field of the line with the pattern's regex expected
-					matches = Pattern.matches(regexDefExpected, line.get(i));
+					fieldMatches = Pattern.matches(regexDefExpected, line.get(i));
 
-					if (!matches) {
+					if (!fieldMatches) {
 
-						lineNonMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
+						/*
+						 * if the field doesn't match, we record the infos of this line : line = (l + 1)
+						 * column = (i + 1) pattern expected = pattern.getLogInfos()[0] +
+						 * pattern.getLogInfos()[2] field expected = pattern.getListRegexName().get(i) =
+						 * found = line.get(i)
+						 */
+						infosLineNonMatching = (l + 1) + " " + (i + 1) + " " + pattern.getLogInfos()[0]
 								+ pattern.getLogInfos()[2] + pattern.getListRegexName().get(i) + " " + line.get(i);
 
-						this.getNonMatching().add(lineNonMatching);
+						this.getNonMatching().add(infosLineNonMatching);
+
+						// if one field doesn't match so the line doesn't match too.
 						lineMatches = false;
 					}
 				}
 
 				if (lineMatches) {
 					nbLinesMatching++;
-				} else {
-					// for the next line to analyse, we give matches its initial value
-					lineMatches = true;
 				}
 
-				matches = true;
-
+				// for the next line to analyse, we give initial values
+				lineMatches = true;
+				fieldMatches = true;
 			}
 		}
 		return nbLinesMatching;
 	}
 
-	// compare all the lines of the logfile with all the patterns of listLogPatterns
+	// depending on start and finish lines, we compare the logfile with ALL the
+	// patterns of listLogPatterns
 	public String compareAllLogPatterns(ListLogPatterns listLogPatterns, ListRegexp listRegexp, int startLine,
 			int finishLine) {
 
@@ -134,21 +142,28 @@ public class LogFile {
 		// we consider that when startLine and finishLine are both equal to -1, then we
 		// have to analyse ALL the lines of the file
 		if (startLine == -1 && finishLine == -1) {
+
 			nbLinesProcessed = this.listLines.size();
 			startLine = 1;
 			finishLine = this.listLines.size();
+
 		} else if (finishLine > this.listLines.size()) {
+
 			finishLine = this.listLines.size();
 			nbLinesProcessed = finishLine - startLine + 1;
+
 		} else {
 			nbLinesProcessed = finishLine - startLine + 1;
 		}
 
+		// if the first line is a header line, we begin the analyse at the second line
+		// and decrement the number of lines processed
 		if (startLine == 1 && this.hasHeaderLine(listLogPatterns, listRegexp)) {
 			startLine = 2;
 			nbLinesProcessed = nbLinesProcessed - 1;
 		}
 
+		// make the comparison for each pattern
 		for (LogPattern pattern : listLogPatterns.getListPatterns()) {
 
 			nbLinesMatching = this.compareLogPattern(pattern, listRegexp, startLine, finishLine);
@@ -156,6 +171,7 @@ public class LogFile {
 			result = result + pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + " : " + nbLinesMatching + " / "
 					+ nbLinesProcessed + "\n";
 
+			// to record the pattern matching the most
 			if (nbLinesMatching > nbMax) {
 				nbMax = nbLinesMatching;
 				this.patternMostMatching = pattern;
@@ -168,17 +184,65 @@ public class LogFile {
 		}
 
 		try {
+			// record the non-matching lines in a new csv file
 			this.recordNonMatchingLines(this.patternMostMatching, listRegexp, startLine, finishLine);
 		} catch (java.lang.NullPointerException e) {
 
-			System.out.println("No pattern is matching !");
+			System.out.println("\nNo pattern is matching with any line !");
 			result = "";
 		}
-		
+
 		return result;
 	}
 
-	// record the non-matching lines only for the pattern which matches the most
+	public void recordInfosNonMatchingLine(String file) {
+
+		// CSV file header
+		String[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
+
+		FileWriter fileWriter = null;
+		CSVPrinter csvFilePrinter = null;
+
+		// Create the CSVFormat object with a header line
+		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
+
+		try {
+
+			// initialise FileWriter object
+			fileWriter = new FileWriter(file + ".csv");
+
+			// initialise CSVPrinter object
+			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
+
+			for (String record : this.nonMatching) {
+
+				String[] field = record.split(" ", 5);
+
+				List<String> data = Arrays.asList(this.fileName, field[0], field[1], field[2], field[3], field[4]);
+
+				// Write the recordNonMatching to the CSV file
+				csvFilePrinter.printRecord(data);
+			}
+
+			System.out.println("Write CSV successfully!");
+
+		} catch (Exception e) {
+			System.out.println("Writing CSV error!");
+			e.printStackTrace();
+		} finally {
+			try {
+				fileWriter.flush();
+				fileWriter.close();
+				csvFilePrinter.close();
+			} catch (IOException e) {
+				System.out.println("Flushing/closing error!");
+				e.printStackTrace();
+			}
+		}
+	}
+
+	// record the non-matching lines in a new csv file only for the pattern which
+	// matches the most
 	public void recordNonMatchingLines(LogPattern pattern, ListRegexp listRegexp, int startLine, int finishLine) {
 
 		List<CSVRecord> list = new ArrayList<CSVRecord>();
@@ -204,77 +268,27 @@ public class LogFile {
 					list.add(line);
 				}
 			}
-
 			matches = true;
 		}
 
 		FileWriter fileWriter = null;
 		CSVPrinter csvFilePrinter = null;
 
-		// Create the CSVFormat object with "\n" as a record delimiter
+		// Create the CSVFormat object
 		CSVFormat csvFileFormat = CSVFormat.DEFAULT;
 
 		try {
 
 			// initialise FileWriter object
-			fileWriter = new FileWriter("linesss.csv");
+			fileWriter = new FileWriter("NonMatchingLines.csv");
 
 			// initialise CSVPrinter object
 			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
 			for (CSVRecord record : list) {
 
-				// Write the recordNonMatching to the CSV file
 				csvFilePrinter.printRecord(record);
 			}
-
-			System.out.println("Write CSV successfully!");
-
-		} catch (Exception e) {
-			System.out.println("Writing CSV error!");
-			e.printStackTrace();
-		} finally {
-			try {
-				fileWriter.flush();
-				fileWriter.close();
-				csvFilePrinter.close();
-			} catch (IOException e) {
-				System.out.println("Flushing/closing error!");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void recordInfosNonMatchingLine(String file) {
-
-		// CSV file header
-		String[] FILE_HEADER = { "file name", "line", "column", "pattern expected", "field expected", "found" };
-
-		FileWriter fileWriter = null;
-		CSVPrinter csvFilePrinter = null;
-
-		// Create the CSVFormat object with "\n" as a record delimiter
-		CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER);
-
-		try {
-
-			// initialise FileWriter object
-			fileWriter = new FileWriter(file + ".csv");
-
-			// initialise CSVPrinter object
-			csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-
-			for (String record : this.nonMatching) {
-
-				String[] field = record.split(" ", 5);
-
-				List<String> data = Arrays.asList(this.fileName, field[0], field[1], field[2], field[3], field[4]);
-
-				// Write the recordNonMatching to the CSV file
-				csvFilePrinter.printRecord(data);
-			}
-
-			System.out.println("Write CSV successfully!");
 
 		} catch (Exception e) {
 			System.out.println("Writing CSV error!");
@@ -333,7 +347,7 @@ public class LogFile {
 			}
 		}
 
-		// if non pattern matches the first line, then it is a header line
+		// if no pattern matches the first line, then it is a header line
 		return (nbPatternMatching == 0);
 	}
 }

@@ -2,6 +2,7 @@ package aliachawaf;
 
 public class Regexp {
 
+	// a regular expression is represented by a name and a definition
 	private String name;
 	private String definition;
 

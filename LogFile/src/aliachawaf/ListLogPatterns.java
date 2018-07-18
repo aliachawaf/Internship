@@ -21,7 +21,11 @@ public class ListLogPatterns {
 		return listPatterns;
 	}
 
-	// setter : open the file entered in parameter and read each line k
+	/* setter : 
+	 * we read the file of log patterns entered in parameter, 
+	 * collect the patterns found (logIdentifier + list of regex names), 
+	 * and then form the list of patterns
+	 */
 	public void setListPatterns(String fileName) {
 
 		try {
@@ -31,19 +35,21 @@ public class ListLogPatterns {
 
 			String line = "";
 			String[] log;
+			String regexName;
 
+			// while we haven't reached the end of file
 			while ((line = b.readLine()) != null) {
+				
 				log = line.split("%");
 
 				// log[0] is the logIdentifier
-				// log[1]...log[n] are regex names
+				// log[1]...log[n] are regex names of the pattern
 				
 				LogPattern pattern = new LogPattern(log[0]);
-
-				String regexName;
+				
 				for (int i = 1; i < log.length; i++) {
 					
-					//we only take the name without the {} which surround it
+					//we only take the name without the {} which surround it in the file
 					regexName = log[i].substring(1, log[i].length()-1);
 					
 					//add the name to the list

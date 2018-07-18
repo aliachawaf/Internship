@@ -5,24 +5,21 @@ import java.util.List;
 
 public class LogPattern {
 
-	/*
-	 * logInfos[0] is the log type ;
+	private String[] logInfos;
+	/* logInfos[0] is the log type ;
 	 * logInfos[1] is the number of fields ;
 	 * logInfos[2] is the n° of pattern for this log type
 	 */
-	
-	private String[] logInfos;
 	private List<String> listRegexName;
 
 	// constructor
 	public LogPattern(String logIdentifier) {
 		logInfos = new String[3];
 		listRegexName = new ArrayList<String>();
-		
 		this.setLogInfos(logIdentifier);
 	}
 
-	// getters & setters
+	// getters
 	public List<String> getListRegexName() {
 		return listRegexName;
 	}
@@ -31,6 +28,7 @@ public class LogPattern {
 		return logInfos;
 	}
 
+	// setter
 	public void setLogInfos(String logIdentifier) {
 
 		String[] substrings = logIdentifier.split("-");                                                                                          
