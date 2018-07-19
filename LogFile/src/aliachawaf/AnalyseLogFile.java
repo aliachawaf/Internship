@@ -31,6 +31,7 @@ public class AnalyseLogFile {
 		// create list of regular expressions
 		ListRegexp listRegexp = new ListRegexp();
 		listRegexp.setListRegexp(jsonConfig.getString("regexps"));
+		listRegexp.replaceNamesByDef();
 
 		// create list of log patterns
 		ListLogPatterns listLogPatterns = new ListLogPatterns();
