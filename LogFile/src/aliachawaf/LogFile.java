@@ -43,17 +43,12 @@ public class LogFile {
 	}
 
 	// setter : we read the logfile and add its lines in the list of lines
-	public void setListLines(char delimiter) {
-
+	public void setListLines(char delimiter, int startLine, int finishLine) {
+		
 		try {
 			Reader reader = Files.newBufferedReader(Paths.get(fileName));
 			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(delimiter));
-
-			for (CSVRecord line : csvParser) {
-
-				this.listLines.add(line);
-			}
-
+			this.listLines = csvParser.getRecords();
 			csvParser.close();
 
 		} catch (java.nio.file.NoSuchFileException e) {
@@ -71,6 +66,7 @@ public class LogFile {
 	// the pattern in parameter
 	public int compareLogPattern(LogPattern pattern, ListRegexp listRegexp, int startLine, int finishLine) {
 
+		System.out.println("here");
 		int nbLinesMatching = 0;
 		boolean fieldMatches = true;
 		boolean lineMatches = true;
@@ -133,6 +129,8 @@ public class LogFile {
 	public String compareAllLogPatterns(ListLogPatterns listLogPatterns, ListRegexp listRegexp, int startLine,
 			int finishLine) {
 
+		System.out.println("begin");
+		
 		String result = "";
 		int nbLinesMatching;
 		int nbLinesProcessed;
@@ -176,6 +174,8 @@ public class LogFile {
 				nbMax = nbLinesMatching;
 				this.patternMostMatching = pattern;
 			}
+			
+			System.out.println(result);
 		}
 
 		if (this.patternMostMatching != null) {
