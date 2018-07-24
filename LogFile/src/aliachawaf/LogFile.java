@@ -22,18 +22,25 @@ public class LogFile {
 	private List<CSVRecord> listLines;
 	private List<String> nonMatching;
 	private LogPattern patternMostMatching;
+	private ListPatternLineMatching list;
 
 	// constructor
-	public LogFile(String fileName) {
+	public LogFile(String fileName, ListPatternLineMatching list) {
 		this.fileName = fileName;
 		this.listLines = new ArrayList<CSVRecord>();
 		this.nonMatching = new ArrayList<String>();
+		this.list = list;
 	}
 
 	// getters
 	public String getFileName() {
 		return fileName;
 	}
+	
+	public ListPatternLineMatching getList() {
+		return list;
+	}
+
 
 	public List<CSVRecord> getListLines() {
 		return listLines;
@@ -96,6 +103,110 @@ public class LogFile {
 		return noMemory;
 	}
 
+	
+	public int compare(ListRegexp listRegexp, char delimiter, ListLogPatterns listLogPatterns) {
+
+		int nbLinesMatching = 0;
+		boolean fieldMatches = true;
+		boolean lineMatches = true;
+
+		String regexNameExpected;
+		String regexDefExpected;
+		String infosLineNonMatching;
+
+		try {
+			Reader reader = Files.newBufferedReader(Paths.get(fileName));
+			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withDelimiter(delimiter));
+int k =0;
+			// we analyse each line of logfile
+			for (CSVRecord line : csvParser) {
+		System.out.println(k);		
+				// make the comparison for each pattern
+				for (LogPattern pattern : listLogPatterns.getListPatterns()) {
+
+					//System.out.println(pattern.getLogInfos()[0]);
+					
+					// we compare only if the line has the same number of fields than the pattern
+					if (line.size() == pattern.getListRegexName().size()) {
+
+						// for each field of the current line, we check if it matches the regex expected
+						for (int i = 0; i < line.size(); i++) {
+
+							regexNameExpected = pattern.getListRegexName().get(i);
+
+							// get the definition of the regex from its name
+							regexDefExpected = listRegexp.getDefinitionByName(regexNameExpected);
+
+							// compare the current field of the line with the pattern's regex expected
+							fieldMatches = Pattern.matches(regexDefExpected, line.get(i));
+
+							if (!fieldMatches) {
+
+								/*
+								 * if the field doesn't match, we record the infos of this line : line = (l + 1)
+								 * column = (i + 1) pattern expected = pattern.getLogInfos()[0] +
+								 * pattern.getLogInfos()[2] field expected = pattern.getListRegexName().get(i) =
+								 * found = line.get(i)
+								 */
+								infosLineNonMatching = line.getRecordNumber() + " " + (i + 1) + " "
+										+ pattern.getLogInfos()[0] + pattern.getLogInfos()[2]
+										+ pattern.getListRegexName().get(i) + " " + line.get(i);
+
+								this.getNonMatching().add(infosLineNonMatching);
+
+								// if one field doesn't match so the line doesn't match too.
+								lineMatches = false;
+							}
+						}
+
+						if (lineMatches) {
+							this.list.incrementNbLinesMatching(pattern);
+							nbLinesMatching++;
+						}
+
+						// for the next line to analyse, we give initial values
+						lineMatches = true;
+						fieldMatches = true;
+					}
+
+				}
+				k++;
+				
+			}
+
+			csvParser.close();
+
+		} catch (
+
+		java.nio.file.NoSuchFileException e) {
+			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
+		} catch (java.nio.file.AccessDeniedException e) {
+			System.out.print("File not found ! Please check your input (path) and re-enter it : ");
+		} catch (java.nio.file.InvalidPathException e) {
+			System.out.print("Invalid path ! Re-enter it : ");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		//System.out.println(pattern.getLogInfos()[0] + pattern.getLogInfos()[2] + " nb lines matching : " + nbLinesMatching); 
+		return nbLinesMatching;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// depending on start and finish lines, we compare the lines of the logfile with
 	// the pattern in parameter
 	public int compareLogPattern(LogPattern pattern, ListRegexp listRegexp, char delimiter) {
@@ -183,8 +294,6 @@ public class LogFile {
 		return nbLinesMatching;
 	}
 
-	
-	
 	
 	// depending on start and finish lines, we compare the logfile with ALL the
 	// patterns of listLogPatterns

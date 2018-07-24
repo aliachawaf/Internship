@@ -37,10 +37,27 @@ public class AnalyseLogFile {
 		// create list of log patterns
 		ListLogPatterns listLogPatterns = new ListLogPatterns();
 		listLogPatterns.setListPatterns(jsonConfig.getString("patterns"));
-
+		
+		
+		////////
+		ListPatternLineMatching list = new ListPatternLineMatching();
+		list.setListPatternLineMatching(listLogPatterns);
+	
+		
 		// read the logfile and set a list of its lines depending on the delimiter
-		LogFile logFile = new LogFile(jsonConfig.getString("inputLog"));
+		LogFile logFile = new LogFile(jsonConfig.getString("inputLog"), list);
 		// logFile.setListLines(jsonConfig.getString("delimiter").charAt(0));
+		
+		logFile.compare(listRegexp, jsonConfig.getString("delimiter").charAt(0), listLogPatterns);
+		
+		for (LineMatchingPattern l : logFile.getList().getListPatternLineMatching()) {
+			
+			System.out.println(l.getPattern().getLogInfos()[0] + l.getPattern().getLogInfos()[2] + " : " + l.getNbLineMatching());
+			
+			
+		}
+		
+		
 		boolean noMemory;
 		int start = jsonConfig.getInt("startLine");
 		int finish = jsonConfig.getInt("finishLine");
@@ -50,16 +67,16 @@ public class AnalyseLogFile {
 		// start, finish);
 
 		// launch comparison with all the patterns according to start and finish lines
-		String result = logFile.compareAllLogPatterns(listLogPatterns, listRegexp,
-				jsonConfig.getString("delimiter").charAt(0));
+	//	String result = logFile.compareAllLogPatterns(listLogPatterns, listRegexp,
+		//		jsonConfig.getString("delimiter").charAt(0));
 
 		// record the infos of non matching lines in a new csv file only if there is at
 		// least 1 pattern matching
-		if (!result.matches("")) {
-			logFile.recordInfosNonMatchingLine(jsonConfig.getString("infosNonMatching"));
-		}
-
-		System.out.println("\n" + result);
+//		if (!result.matches("")) {
+//			logFile.recordInfosNonMatchingLine(jsonConfig.getString("infosNonMatching"));
+//		}
+//
+//		System.out.println("\n" + result);
 		nextStart = nextStart + logFile.getListLines().size() + 1;
 		finish = -1;
 		start = nextStart;
