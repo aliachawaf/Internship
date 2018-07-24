@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Scanner;
 import javax.json.JsonReader;
+
 import javax.json.JsonObject;
 import javax.json.Json;
 
@@ -39,17 +40,29 @@ public class AnalyseLogFile {
 
 		// read the logfile and set a list of its lines depending on the delimiter
 		LogFile logFile = new LogFile(jsonConfig.getString("inputLog"));
-		logFile.setListLines(jsonConfig.getString("delimiter").charAt(0));
+		// logFile.setListLines(jsonConfig.getString("delimiter").charAt(0));
+		boolean noMemory;
+		int start = jsonConfig.getInt("startLine");
+		int finish = jsonConfig.getInt("finishLine");
+		int nextStart = 0;
+
+		// noMemory = logFile.setListLines(jsonConfig.getString("delimiter").charAt(0),
+		// start, finish);
 
 		// launch comparison with all the patterns according to start and finish lines
-		String result = logFile.compareAllLogPatterns(listLogPatterns, listRegexp, jsonConfig.getInt("startLine"), jsonConfig.getInt("finishLine"));
+		String result = logFile.compareAllLogPatterns(listLogPatterns, listRegexp,
+				jsonConfig.getString("delimiter").charAt(0));
 
-		// record the infos of non matching lines in a new csv file only if there is at least 1 pattern matching
+		// record the infos of non matching lines in a new csv file only if there is at
+		// least 1 pattern matching
 		if (!result.matches("")) {
 			logFile.recordInfosNonMatchingLine(jsonConfig.getString("infosNonMatching"));
 		}
-		
+
 		System.out.println("\n" + result);
+		nextStart = nextStart + logFile.getListLines().size() + 1;
+		finish = -1;
+		start = nextStart;
 
 		scanner.close();
 	}
