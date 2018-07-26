@@ -1,11 +1,11 @@
 package aliachawaf;
 
-public class LineMatchingPattern {
+public class PatternLineMatching {
 
 	private LogPattern pattern;
 	private int nbLineMatching;
 	
-	public LineMatchingPattern(LogPattern pattern) {
+	public PatternLineMatching(LogPattern pattern) {
 		this.pattern = pattern;
 		this.nbLineMatching = 0 ;
 	}

@@ -5,47 +5,39 @@ import java.util.List;
 
 public class ListPatternLineMatching {
 
-	private List<LineMatchingPattern> listPatternLineMatching;
+	private List<PatternLineMatching> listPatternLineMatching;
 
-	
-	
 	public ListPatternLineMatching() {
-		listPatternLineMatching = new ArrayList<LineMatchingPattern>();
+		listPatternLineMatching = new ArrayList<PatternLineMatching>();
 	}
 
-	
-	
-	public List<LineMatchingPattern> getListPatternLineMatching() {
+	public List<PatternLineMatching> getListPatternLineMatching() {
 		return listPatternLineMatching;
 	}
 
 	public void setListPatternLineMatching(ListLogPatterns listPatterns) {
-		
+
 		LogPattern pattern;
-		
-		for (int i = 0 ; i<listPatterns.getListPatterns().size() ; i++) {
-			
+
+		for (int i = 0; i < listPatterns.getListPatterns().size(); i++) {
+
 			pattern = listPatterns.getListPatterns().get(i);
-			LineMatchingPattern couple = new LineMatchingPattern(pattern);
+			PatternLineMatching couple = new PatternLineMatching(pattern);
 			this.listPatternLineMatching.add(couple);
-			
-		}	
+		}
 	}
 
 	public void incrementNbLinesMatching(LogPattern pattern) {
 
 		// searching for the pattern in the list
-		for (LineMatchingPattern l : this.listPatternLineMatching) {
-			
+		for (PatternLineMatching l : this.listPatternLineMatching) {
+
 			if (l.getPattern() == pattern) {
+
 				// increment the nb of lines matching
-				//System.out.println(l.getNbLineMatching());
 				int nb = l.getNbLineMatching() + 1;
-				//System.out.println(pattern.getLogInfos()[0]+pattern.getLogInfos()[2] + " " + nb);
 				l.setNbLineMatching(nb);
 			}
 		}
-
 	}
-
 }

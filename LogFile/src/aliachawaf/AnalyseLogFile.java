@@ -2,8 +2,9 @@ package aliachawaf;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Scanner;
 import javax.json.JsonReader;
 
 import javax.json.JsonObject;
@@ -12,8 +13,6 @@ import javax.json.Json;
 public class AnalyseLogFile {
 
 	public static void main(String[] args) {
-
-		Scanner scanner = new Scanner(System.in);
 
 		// Open and read JSON Config file
 		JsonReader reader = null;
@@ -37,50 +36,45 @@ public class AnalyseLogFile {
 		// create list of log patterns
 		ListLogPatterns listLogPatterns = new ListLogPatterns();
 		listLogPatterns.setListPatterns(jsonConfig.getString("patterns"));
-		
-		
-		////////
+
+		// create a list of the couples pattern/numberOfLineMatching
+		// PS : at the beginning, numberOfLineMatching = 0
 		ListPatternLineMatching list = new ListPatternLineMatching();
 		list.setListPatternLineMatching(listLogPatterns);
-	
-		
+
 		// read the logfile and set a list of its lines depending on the delimiter
 		LogFile logFile = new LogFile(jsonConfig.getString("inputLog"), list);
-		// logFile.setListLines(jsonConfig.getString("delimiter").charAt(0));
-		
-		logFile.compare(listRegexp, jsonConfig.getString("delimiter").charAt(0), listLogPatterns);
-		
-		for (LineMatchingPattern l : logFile.getList().getListPatternLineMatching()) {
-			
-			System.out.println(l.getPattern().getLogInfos()[0] + l.getPattern().getLogInfos()[2] + " : " + l.getNbLineMatching());
-			
-			
+
+		// change the value of start and finish line if both equal to -1
+		int startLine, finishLine;
+
+		if (jsonConfig.getInt("startLine") == -1 && jsonConfig.getInt("finishLine") == -1) {
+			startLine = 1;
+			finishLine = logFile.nbLinesLogFile();
+		} else {
+			startLine = jsonConfig.getInt("startLine");
+			finishLine = jsonConfig.getInt("finishLine");
 		}
-		
-		
-		boolean noMemory;
-		int start = jsonConfig.getInt("startLine");
-		int finish = jsonConfig.getInt("finishLine");
-		int nextStart = 0;
 
-		// noMemory = logFile.setListLines(jsonConfig.getString("delimiter").charAt(0),
-		// start, finish);
+		// we clear the file nonMatchingLines.csv to append the new non-matching lines
+		try {
+			// append = false
+			FileWriter fw = new FileWriter("nonMatchingLines.csv", false);
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-		// launch comparison with all the patterns according to start and finish lines
-	//	String result = logFile.compareAllLogPatterns(listLogPatterns, listRegexp,
-		//		jsonConfig.getString("delimiter").charAt(0));
+		// launch the analysis
+		logFile.compare(listRegexp, jsonConfig.getString("delimiter").charAt(0), listLogPatterns, startLine,
+				finishLine);
 
-		// record the infos of non matching lines in a new csv file only if there is at
-		// least 1 pattern matching
-//		if (!result.matches("")) {
-//			logFile.recordInfosNonMatchingLine(jsonConfig.getString("infosNonMatching"));
-//		}
-//
-//		System.out.println("\n" + result);
-		nextStart = nextStart + logFile.getListLines().size() + 1;
-		finish = -1;
-		start = nextStart;
+		// output the results
+		int nbLinesProcessed = finishLine - startLine + 1;
+		for (PatternLineMatching l : logFile.getList().getListPatternLineMatching()) {
 
-		scanner.close();
+			System.out.println(l.getPattern().getLogInfos()[0] + l.getPattern().getLogInfos()[2] + ": "
+					+ l.getNbLineMatching() + " / " + nbLinesProcessed);
+		}
 	}
 }
